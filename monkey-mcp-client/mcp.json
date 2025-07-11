@@ -1,0 +1,8 @@
+{
+  "servers": {
+    "localtest": {
+      "type": "sse",
+      "url": "http://localhost:9999/mcp/sse"
+    }
+  }
+}
