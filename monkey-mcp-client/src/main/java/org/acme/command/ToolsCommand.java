@@ -7,7 +7,6 @@ import org.acme.client.ToolsService;
 import dev.langchain4j.agent.tool.ToolSpecification;
 import jakarta.inject.Inject;
 import picocli.CommandLine.Command;
-import picocli.CommandLine.Option;
 
 /**
  * Command to list available MCP tools from registered servers.
