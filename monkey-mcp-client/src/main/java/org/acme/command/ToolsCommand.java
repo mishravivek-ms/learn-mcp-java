@@ -3,19 +3,11 @@ package org.acme.command;
 import static java.lang.System.err;
 import static java.lang.System.out;
 
-import java.util.List;
-
 import org.acme.client.ToolsService;
 
 import dev.langchain4j.agent.tool.ToolSpecification;
 import picocli.CommandLine.Command;
 
-/**
- * Command to list available MCP tools from registered servers.
- * 
- * This command connects to registered MCP servers and displays
- * information about available tools and their specifications.
- */
 @Command(name = "tools", description = "List available MCP tools from registered servers")
 public class ToolsCommand implements Runnable {
 
