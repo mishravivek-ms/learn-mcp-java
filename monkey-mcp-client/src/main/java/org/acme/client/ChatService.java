@@ -25,8 +25,8 @@ public class ChatService {
     public ChatService() {
         try {
             chatModel = OllamaChatModel.builder()
-                    .baseUrl("http://localhost:11434") // Default Ollama endpoint
-                    .modelName("llama3.2") // Specify the model to use
+                    .baseUrl("http://localhost:11434")
+                    .modelName("llama3.2")
                     .temperature(0.7)
                     .build();
 
@@ -48,16 +48,6 @@ public class ChatService {
         } catch (Exception e) {
             err.println("✗ Failed to initialize chat service: " + e.getMessage());
             e.printStackTrace(System.err);
-        }
-    }
-
-    public String chat(String message) {
-        try {
-            return bot.chat(DEFAULT_USER_ID, message);
-        } catch (Exception e) {
-            err.println("✗ Error during chat interaction: " + e.getMessage());
-            e.printStackTrace(System.err);
-            return "Sorry, I encountered an error while processing your message.";
         }
     }
 
@@ -95,15 +85,11 @@ public class ChatService {
                     }
                 }
 
-                var response = chat(input);
+                var response = bot.chat(DEFAULT_USER_ID, input);
 
                 out.printf("AI: %s\n", response);
             }
         }
-    }
-
-    public boolean isAvailable() {
-        return bot != null && chatModel != null;
     }
 
 }

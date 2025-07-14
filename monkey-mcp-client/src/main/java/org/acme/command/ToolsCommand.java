@@ -13,8 +13,6 @@ import picocli.CommandLine.Command;
 @Command(name = "tools", description = "List available MCP tools from registered servers")
 public class ToolsCommand implements Runnable {
 
-    ToolsService toolsService = new ToolsService();
-
     @Override
     public void run() {
         try {
@@ -24,6 +22,7 @@ public class ToolsCommand implements Runnable {
             out.println("═══════════════════════════════════");
             out.println();
 
+            var toolsService = new ToolsService();
             var tools = toolsService.getAvailableTools();
 
             if (tools.isEmpty()) {
