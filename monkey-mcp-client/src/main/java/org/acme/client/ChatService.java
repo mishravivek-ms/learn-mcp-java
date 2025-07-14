@@ -15,16 +15,14 @@ import dev.langchain4j.store.memory.chat.InMemoryChatMemoryStore;
 
 public class ChatService {
 
-    private ToolsService toolsService;
-
-    private Bot bot;
     private static final String DEFAULT_USER_ID = "default-user";
 
+    private ToolsService toolsService = new ToolsService();
+
+    private Bot bot;
     private ChatModel chatModel;
 
     public ChatService() {
-        toolsService = new ToolsService();
-
         try {
             chatModel = OllamaChatModel.builder()
                     .baseUrl("http://localhost:11434") // Default Ollama endpoint
@@ -69,9 +67,9 @@ public class ChatService {
         out.println("      Monkey MCP Chat");
         out.println("═══════════════════════════════════");
         out.println("→ Starting chat with Ollama (llama3.2) + MCP Tools");
-        out.printf("→ Available tools: %d monkey species tool%s%n", 
-            toolsService.getAvailableTools().size(),
-            toolsService.getAvailableTools().size() == 1 ? "" : "s");
+        out.printf("→ Available tools: %d monkey species tool%s%n",
+                toolsService.getAvailableTools().size(),
+                toolsService.getAvailableTools().size() == 1 ? "" : "s");
         out.println();
         out.println("💡 Try asking:");
         out.println("   • 'What monkey species do you know?'");
@@ -98,7 +96,7 @@ public class ChatService {
                 }
 
                 var response = chat(input);
-                
+
                 out.printf("AI: %s\n", response);
             }
         }
