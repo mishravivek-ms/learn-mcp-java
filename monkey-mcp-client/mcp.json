@@ -2,7 +2,7 @@
   "servers": {
     "localtest": {
       "type": "sse",
-      "url": "http://localhost:9999/mcp/sse"
+      "url": "http://localhost:8080/mcp/sse"
     }
   }
 }

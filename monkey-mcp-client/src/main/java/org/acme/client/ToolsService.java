@@ -15,13 +15,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import dev.langchain4j.agent.tool.ToolSpecification;
+import dev.langchain4j.mcp.McpToolProvider;
 import dev.langchain4j.mcp.client.DefaultMcpClient;
 import dev.langchain4j.mcp.client.McpClient;
 import dev.langchain4j.mcp.client.transport.McpTransport;
 import dev.langchain4j.mcp.client.transport.http.HttpMcpTransport;
-import dev.langchain4j.mcp.McpToolProvider;
-import jakarta.annotation.PostConstruct;
-import jakarta.enterprise.context.ApplicationScoped;
 
 /**
  * Service for managing MCP (Model Context Protocol) tools.
@@ -29,7 +27,6 @@ import jakarta.enterprise.context.ApplicationScoped;
  * This service handles the registration of MCP servers from configuration
  * and provides access to available tools from those servers.
  */
-@ApplicationScoped
 public class ToolsService {
 
     private static final Logger LOG = LoggerFactory.getLogger(ToolsService.class);
@@ -38,11 +35,7 @@ public class ToolsService {
     private final List<McpClient> mcpClients = new ArrayList<>();
     private McpToolProvider toolProvider;
 
-    /**
-     * Initializes the MCP clients and tool provider on application startup.
-     */
-    @PostConstruct
-    public void init() {
+    public ToolsService() {
         LOG.info("Initializing MCP tools service...");
         try {
             registerMCPServers();
@@ -59,12 +52,12 @@ public class ToolsService {
      */
     private void registerMCPServers() {
         InputStream inputStream = getMcpConfigStream();
-        
+
         if (inputStream == null) {
             LOG.warn("mcp.json configuration file not found in working directory or resources");
             return;
         }
-        
+
         try (InputStream is = inputStream) {
             JsonNode config = objectMapper.readTree(is);
             JsonNode servers = config.get("servers");
@@ -88,7 +81,7 @@ public class ToolsService {
             LOG.error("Failed to read mcp.json configuration", e);
         }
     }
-    
+
     /**
      * Gets the MCP configuration stream with prioritized loading:
      * 1. Check working directory for mcp.json
@@ -107,7 +100,7 @@ public class ToolsService {
                 LOG.warn("Failed to read mcp.json from working directory, falling back to bundled resource", e);
             }
         }
-        
+
         // Fall back to bundled resource
         InputStream resourceStream = getClass().getClassLoader().getResourceAsStream("mcp.json");
         if (resourceStream != null) {

@@ -2,7 +2,6 @@ package org.acme.command;
 
 import org.acme.client.ChatService;
 
-import jakarta.inject.Inject;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
@@ -13,14 +12,16 @@ import picocli.CommandLine.Parameters;
  * This command provides an interactive chat interface with the Ollama
  * language model using LangChain4J for conversation management.
  */
-@Command(name = "chat", 
-         description = "Start a chat session with Ollama LLM")
+@Command(name = "chat", description = "Start a chat session with Ollama LLM")
 public class ChatCommand implements Runnable {
 
-    @Inject
     ChatService chatService;
 
-    @Option(names = {"-m", "--message"}, description = "Send a single message and exit")
+    public ChatCommand() {
+        chatService = new ChatService();
+    }
+
+    @Option(names = { "-m", "--message" }, description = "Send a single message and exit")
     private String singleMessage;
 
     @Parameters(description = "Message to send (alternative to --message)")

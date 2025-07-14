@@ -5,7 +5,6 @@ import java.util.List;
 import org.acme.client.ToolsService;
 
 import dev.langchain4j.agent.tool.ToolSpecification;
-import jakarta.inject.Inject;
 import picocli.CommandLine.Command;
 
 /**
@@ -18,8 +17,11 @@ import picocli.CommandLine.Command;
          description = "List available MCP tools from registered servers")
 public class ToolsCommand implements Runnable {
 
-    @Inject
     ToolsService toolsService;
+
+    public ToolsCommand() {
+        toolsService = new ToolsService();
+    }
 
     @Override
     public void run() {
