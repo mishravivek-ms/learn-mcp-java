@@ -13,13 +13,8 @@ import dev.langchain4j.service.AiServices;
 import dev.langchain4j.store.memory.chat.ChatMemoryStore;
 import dev.langchain4j.store.memory.chat.InMemoryChatMemoryStore;
 
-/**
- * Service for managing chat interactions with Ollama LLM and MCP tools.
- * 
- * This service provides a console interface for chatting with
- * the Ollama language model using LangChain4J and integrates
- * with MCP tools for enhanced functionality.
- */
+import static java.lang.System.out;
+
 public class ChatService {
 
     private static final Logger LOG = LoggerFactory.getLogger(ChatService.class);
@@ -35,17 +30,14 @@ public class ChatService {
         toolsService = new ToolsService();
 
         try {
-            // Build the ChatModel
             chatModel = OllamaChatModel.builder()
                     .baseUrl("http://localhost:11434") // Default Ollama endpoint
                     .modelName("llama3.2") // Specify the model to use
                     .temperature(0.7)
                     .build();
 
-            // Initialize the chat memory store
             ChatMemoryStore chatMemoryStore = new InMemoryChatMemoryStore();
 
-            // Initialize the Bot with chat model, tool provider, and memory
             bot = AiServices.builder(Bot.class)
                     .chatModel(chatModel)
                     .toolProvider(toolsService.getToolProvider())
@@ -63,13 +55,6 @@ public class ChatService {
         }
     }
 
-    /**
-     * Sends a single message to the bot and returns the response.
-     * The bot can use available MCP tools to provide enhanced responses.
-     * 
-     * @param message the message to send
-     * @return the bot's response
-     */
     public String chat(String message) {
         try {
             return bot.chat(DEFAULT_USER_ID, message);
@@ -79,57 +64,38 @@ public class ChatService {
         }
     }
 
-    /**
-     * Starts an interactive chat session in the console.
-     */
     public void startInteractiveChat() {
-        System.out.println("=== Monkey MCP Chat ===");
-        System.out.println("Starting chat with Ollama (llama3.2) + MCP Tools");
-        System.out.println("Available tools: " + toolsService.getAvailableTools().size() + " monkey species tools");
-        System.out.println("Type 'exit', 'quit', or 'bye' to end the conversation");
-        System.out.println("Try asking: 'What monkey species do you know?' or 'Tell me about a random monkey'");
-        System.out.println("================================================================\n");
+        out.println("=== Monkey MCP Chat ===");
+        out.println("Starting chat with Ollama (llama3.2) + MCP Tools");
+        out.println("Available tools: " + toolsService.getAvailableTools().size() + " monkey species tools");
+        out.println("Type 'exit', 'quit', or 'bye' to end the conversation");
+        out.println("Try asking: 'What monkey species do you know?' or 'Tell me about a random monkey'");
+        out.println("================================================================\n");
 
-        try (Scanner scanner = new Scanner(System.in)) {
+        try (var scanner = new Scanner(System.in)) {
             while (true) {
-                System.out.print("You: ");
-                String input = scanner.nextLine().trim();
+                out.print("You: ");
+                var input = scanner.nextLine().trim();
 
                 if (input.isEmpty()) {
                     continue;
                 }
 
-                // Check for exit commands
-                if (input.equalsIgnoreCase("exit") ||
-                        input.equalsIgnoreCase("quit") ||
-                        input.equalsIgnoreCase("bye")) {
-                    System.out.println("Goodbye! 👋");
-                    break;
+                switch (input.toLowerCase()) {
+                    case "exit", "quit", "bye" -> {
+                        out.println("Goodbye! 👋");
+                        return;
+                    }
                 }
 
-                // Get response from AI Bot (with tools)
-                System.out.print("AI: ");
-                String response = chat(input);
-                System.out.println(response + "\n");
+                var response = chat(input);
+                out.printf("AI: %s\n", response);
             }
         }
     }
 
-    /**
-     * Checks if the chat service is available.
-     * 
-     * @return true if the bot is initialized and ready
-     */
     public boolean isAvailable() {
         return bot != null && chatModel != null;
     }
 
-    /**
-     * Gets the number of available MCP tools.
-     * 
-     * @return the number of tools available to the bot
-     */
-    public int getAvailableToolsCount() {
-        return toolsService.getAvailableTools().size();
-    }
 }

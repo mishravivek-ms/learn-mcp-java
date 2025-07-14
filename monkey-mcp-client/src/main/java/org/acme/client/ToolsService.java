@@ -166,11 +166,11 @@ public class ToolsService {
      * @return List of tool specifications
      */
     public List<ToolSpecification> getAvailableTools() {
-        List<ToolSpecification> allTools = new ArrayList<>();
+        var allTools = new ArrayList<ToolSpecification>();
 
-        for (McpClient client : mcpClients) {
+        for (var client : mcpClients) {
             try {
-                List<ToolSpecification> clientTools = client.listTools();
+                var clientTools = client.listTools();
                 allTools.addAll(clientTools);
                 LOG.debug("Retrieved {} tools from MCP server: {}", clientTools.size(), client.key());
             } catch (Exception e) {
@@ -182,21 +182,8 @@ public class ToolsService {
         return allTools;
     }
 
-    /**
-     * Gets the number of registered MCP clients.
-     * 
-     * @return Number of registered clients
-     */
-    public int getRegisteredClientsCount() {
-        return mcpClients.size();
-    }
-
-    /**
-     * Gets the tool provider for use in other services.
-     * 
-     * @return The MCP tool provider
-     */
     public McpToolProvider getToolProvider() {
         return toolProvider;
     }
+
 }
