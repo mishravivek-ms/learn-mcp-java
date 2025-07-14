@@ -9,21 +9,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-/**
- * MCP Server implementation for monkey species operations.
- * Provides tools for listing, retrieving details, and getting random monkey species.
- */
 @ApplicationScoped
 public class MonkeySpeciesMcpServer {
     
     @Inject
     MonkeySpeciesService monkeySpeciesService;
     
-    /**
-     * Lists all available monkey species.
-     * 
-     * @return A formatted string containing all monkey species with basic information
-     */
     @Tool(name = "list_monkey_species", description = "List all available monkey species with their basic information")
     public String listMonkeySpecies() {
         try {
@@ -50,12 +41,6 @@ public class MonkeySpeciesMcpServer {
         }
     }
     
-    /**
-     * Gets detailed information for a specific monkey species.
-     * 
-     * @param speciesName The name of the monkey species to get details for
-     * @return Detailed information about the specified monkey species
-     */
     @Tool(name = "get_monkey_species_details", description = "Get detailed information for a specific monkey species by name")
     public String getMonkeySpeciesDetails(String speciesName) {
         if (speciesName == null || speciesName.trim().isEmpty()) {
@@ -82,11 +67,6 @@ public class MonkeySpeciesMcpServer {
         }
     }
     
-    /**
-     * Gets a random monkey species from the database.
-     * 
-     * @return Detailed information about a randomly selected monkey species
-     */
     @Tool(name = "get_random_monkey_species", description = "Get a random monkey species with full details")
     public String getRandomMonkeySpecies() {
         try {
@@ -100,13 +80,8 @@ public class MonkeySpeciesMcpServer {
         } catch (Exception e) {
             return "Error retrieving random monkey species: " + e.getMessage();
         }
-    }
+    } 
     
-    /**
-     * Gets statistics about the monkey species database.
-     * 
-     * @return Statistical information about the database
-     */
     @Tool(name = "get_monkey_species_stats", description = "Get statistics about the monkey species database")
     public String getMonkeySpeciesStats() {
         try {

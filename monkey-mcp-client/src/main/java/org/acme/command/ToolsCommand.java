@@ -3,6 +3,8 @@ package org.acme.command;
 import static java.lang.System.err;
 import static java.lang.System.out;
 
+import java.util.function.Consumer;
+
 import org.acme.client.ToolsService;
 
 import dev.langchain4j.agent.tool.ToolSpecification;
@@ -16,37 +18,33 @@ public class ToolsCommand implements Runnable {
     @Override
     public void run() {
         try {
-            out.println("Available MCP Tools:");
-            out.println("====================");
+            out.println("========================");
+            out.println("  Available MCP Tools:  ");
+            out.println("------------------------");
 
             var tools = toolsService.getAvailableTools();
 
             if (tools.isEmpty()) {
-                out.println("No tools available from registered MCP servers.");
-                out.println("Please ensure MCP servers are running and properly configured.");
+                out.println("   No tools available from registered MCP servers.");
+                out.println("   Please ensure MCP servers are running and properly configured.");
                 return;
             }
 
-            for (var tool : tools) {
-                displayTool(tool);
-            }
+            Consumer<ToolSpecification> printFunction = (ts) -> {
+                out.println("# TOOL NAME: " + ts.name());
+                if (ts.description() != null && !ts.description().isEmpty()) {
+                    out.println("## Description: " + ts.description());
+                }
+                if (ts.parameters() != null) {
+                    out.println("## Parameters: " + ts.parameters().toString());
+                }
+            };
 
+            tools.stream().forEach(printFunction);
             out.println("\nTotal tools available: " + tools.size());
-
         } catch (Exception e) {
             err.println("Error listing MCP tools: " + e.getMessage());
         }
     }
 
-    private void displayTool(ToolSpecification tool) {
-        out.println("\n• " + tool.name());
-
-        if (tool.description() != null && !tool.description().isEmpty()) {
-            out.println("  Description: " + tool.description());
-        }
-
-        if (tool.parameters() != null) {
-            out.println("  Parameters: " + tool.parameters().toString());
-        }
-    }
 }
