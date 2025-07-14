@@ -25,7 +25,7 @@ public class ToolsCommand implements Runnable {
     public void run() {
         try {
             out.println("Available MCP Tools:");
-            out.println("==================");
+            out.println("====================");
 
             var tools = toolsService.getAvailableTools();
 

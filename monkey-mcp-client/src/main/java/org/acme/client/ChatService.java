@@ -1,23 +1,19 @@
 package org.acme.client;
 
+import static java.lang.System.err;
+import static java.lang.System.out;
+
 import java.util.Scanner;
 
 import org.acme.model.Bot;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.ollama.OllamaChatModel;
 import dev.langchain4j.service.AiServices;
-import dev.langchain4j.store.memory.chat.ChatMemoryStore;
 import dev.langchain4j.store.memory.chat.InMemoryChatMemoryStore;
 
-import static java.lang.System.out;
-
 public class ChatService {
-
-    private static final Logger LOG = LoggerFactory.getLogger(ChatService.class);
 
     private ToolsService toolsService;
 
@@ -36,7 +32,7 @@ public class ChatService {
                     .temperature(0.7)
                     .build();
 
-            ChatMemoryStore chatMemoryStore = new InMemoryChatMemoryStore();
+            var chatMemoryStore = new InMemoryChatMemoryStore();
 
             bot = AiServices.builder(Bot.class)
                     .chatModel(chatModel)
@@ -48,10 +44,11 @@ public class ChatService {
                             .build())
                     .build();
 
-            LOG.info("Chat service initialized with Ollama model and {} MCP tools",
-                    toolsService.getAvailableTools().size());
+            out.println("Chat service initialized with Ollama model and " +
+                    toolsService.getAvailableTools().size() + " MCP tools");
         } catch (Exception e) {
-            LOG.error("Failed to initialize chat service", e);
+            err.println("Failed to initialize chat service: " + e.getMessage());
+            e.printStackTrace(System.err);
         }
     }
 
@@ -59,7 +56,8 @@ public class ChatService {
         try {
             return bot.chat(DEFAULT_USER_ID, message);
         } catch (Exception e) {
-            LOG.error("Error during chat interaction", e);
+            err.println("Error during chat interaction: " + e.getMessage());
+            e.printStackTrace(System.err);
             return "Sorry, I encountered an error while processing your message.";
         }
     }
@@ -89,6 +87,7 @@ public class ChatService {
                 }
 
                 var response = chat(input);
+                
                 out.printf("AI: %s\n", response);
             }
         }

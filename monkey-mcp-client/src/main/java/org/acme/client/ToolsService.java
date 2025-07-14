@@ -1,9 +1,11 @@
 package org.acme.client;
 
+import static java.lang.System.err;
+import static java.lang.System.out;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,15 +20,8 @@ import dev.langchain4j.agent.tool.ToolSpecification;
 import dev.langchain4j.mcp.McpToolProvider;
 import dev.langchain4j.mcp.client.DefaultMcpClient;
 import dev.langchain4j.mcp.client.McpClient;
-import dev.langchain4j.mcp.client.transport.McpTransport;
 import dev.langchain4j.mcp.client.transport.http.HttpMcpTransport;
 
-/**
- * Service for managing MCP (Model Context Protocol) tools.
- * 
- * This service handles the registration of MCP servers from configuration
- * and provides access to available tools from those servers.
- */
 public class ToolsService {
 
     private static final Logger LOG = LoggerFactory.getLogger(ToolsService.class);
@@ -36,34 +31,30 @@ public class ToolsService {
     private McpToolProvider toolProvider;
 
     public ToolsService() {
-        LOG.info("Initializing MCP tools service...");
+        out.println("Initializing MCP tools service...");
         try {
             registerMCPServers();
             initializeToolProvider();
-            LOG.info("MCP tools service initialized successfully");
+            out.println("MCP tools service initialized successfully");
         } catch (Exception e) {
-            LOG.error("Failed to initialize MCP tools service", e);
+            err.printf("Failed to initialize MCP tools service: %s%n", e.getMessage());
         }
     }
 
-    /**
-     * Registers MCP servers from the mcp.json configuration file.
-     * Prioritizes loading from the working directory over bundled resource.
-     */
     private void registerMCPServers() {
-        InputStream inputStream = getMcpConfigStream();
+        var inputStream = getMcpConfigStream();
 
         if (inputStream == null) {
-            LOG.warn("mcp.json configuration file not found in working directory or resources");
+            out.println("mcp.json configuration file not found in working directory or resources");
             return;
         }
 
-        try (InputStream is = inputStream) {
-            JsonNode config = objectMapper.readTree(is);
-            JsonNode servers = config.get("servers");
+        try (var is = inputStream) {
+            var config = objectMapper.readTree(is);
+            var servers = config.get("servers");
 
             if (servers == null || !servers.isObject()) {
-                LOG.warn("No servers configuration found in mcp.json");
+                out.println("No servers configuration found in mcp.json");
                 return;
             }
 
@@ -71,85 +62,69 @@ public class ToolsService {
                 try {
                     registerServer(serverName, servers.get(serverName));
                 } catch (Exception e) {
-                    LOG.error("Failed to register MCP server: " + serverName, e);
+                    err.printf("Failed to register MCP server: %s%n", serverName);
                 }
             });
 
-            LOG.info("MCP server registration completed. {} servers registered", mcpClients.size());
+            out.printf("MCP server registration completed. %d servers registered%n", mcpClients.size());
 
         } catch (IOException e) {
-            LOG.error("Failed to read mcp.json configuration", e);
+            err.printf("Failed to read mcp.json configuration: %s%n", e.getMessage());
         }
     }
 
-    /**
-     * Gets the MCP configuration stream with prioritized loading:
-     * 1. Check working directory for mcp.json
-     * 2. Fall back to bundled resource
-     * 
-     * @return InputStream for mcp.json or null if not found
-     */
     private InputStream getMcpConfigStream() {
-        // First, try to load from working directory
-        Path workingDirConfig = Paths.get("mcp.json");
+        var workingDirConfig = Paths.get("mcp.json");
         if (Files.exists(workingDirConfig)) {
             try {
-                LOG.info("Loading mcp.json from working directory: {}", workingDirConfig.toAbsolutePath());
+                out.printf("Loading mcp.json from working directory: %s%n", workingDirConfig.toAbsolutePath());
                 return Files.newInputStream(workingDirConfig);
             } catch (IOException e) {
-                LOG.warn("Failed to read mcp.json from working directory, falling back to bundled resource", e);
+                err.printf("Failed to read mcp.json from working directory, falling back to bundled resource: %s%n", e.getMessage());
             }
         }
 
-        // Fall back to bundled resource
-        InputStream resourceStream = getClass().getClassLoader().getResourceAsStream("mcp.json");
+        var resourceStream = getClass().getClassLoader().getResourceAsStream("mcp.json");
         if (resourceStream != null) {
-            LOG.info("Loading mcp.json from bundled resource");
+            out.println("Loading mcp.json from bundled resource");
         }
         return resourceStream;
     }
 
-    /**
-     * Registers a single MCP server from configuration.
-     */
     private void registerServer(String serverName, JsonNode serverConfig) {
         try {
-            String url = serverConfig.get("url").asText();
-            String type = serverConfig.get("type").asText();
+            var url = serverConfig.get("url").asText();
+            var type = serverConfig.get("type").asText();
 
             if (!"sse".equals(type)) {
-                LOG.warn("Unsupported transport type '{}' for server: {}", type, serverName);
+                err.printf("Unsupported transport type '%s' for server: %s%n", type, serverName);
                 return;
             }
 
-            LOG.info("Registering MCP server: {} with URL: {}", serverName, url);
+            out.printf("Registering MCP server: %s with URL: %s%n", serverName, url);
 
-            McpTransport mcpTransport = new HttpMcpTransport.Builder()
+            var mcpTransport = new HttpMcpTransport.Builder()
                     .sseUrl(url)
                     .logRequests(false) // Disable logging for better performance
                     .logResponses(false)
                     .build();
 
-            McpClient mcpClient = new DefaultMcpClient.Builder()
+            var mcpClient = new DefaultMcpClient.Builder()
                     .key(serverName)
                     .transport(mcpTransport)
                     .build();
 
-            // Add client to the list (connection will be tested when tools are requested)
             mcpClients.add(mcpClient);
-            LOG.info("Successfully registered MCP server: {}", serverName);
+            out.printf("Successfully registered MCP server: %s%n", serverName);
 
         } catch (Exception e) {
-            LOG.error("Failed to register MCP server: " + serverName, e);
+            err.printf("Failed to register MCP server: %s%n", serverName);
         }
     }
 
-    /**
-     * Initializes the tool provider with registered MCP clients.
-     */
     private void initializeToolProvider() {
         if (mcpClients.isEmpty()) {
-            LOG.warn("No MCP clients registered, tool provider will be empty");
+            out.println("No MCP clients registered, tool provider will be empty");
             return;
         }
 
@@ -157,14 +132,9 @@ public class ToolsService {
                 .mcpClients(mcpClients.toArray(new McpClient[0]))
                 .build();
 
-        LOG.info("Tool provider initialized with {} MCP clients", mcpClients.size());
+        out.printf("Tool provider initialized with %d MCP clients%n", mcpClients.size());
     }
 
-    /**
-     * Gets the list of available tools from all registered MCP servers.
-     * 
-     * @return List of tool specifications
-     */
     public List<ToolSpecification> getAvailableTools() {
         var allTools = new ArrayList<ToolSpecification>();
 
@@ -172,13 +142,13 @@ public class ToolsService {
             try {
                 var clientTools = client.listTools();
                 allTools.addAll(clientTools);
-                LOG.debug("Retrieved {} tools from MCP server: {}", clientTools.size(), client.key());
+                out.printf("Retrieved %d tools from MCP server: %s%n", clientTools.size(), client.key());
             } catch (Exception e) {
-                LOG.error("Failed to get tools from MCP server: " + client.key(), e);
+                out.printf("Failed to get tools from MCP server: %s%n", client.key());
             }
         }
 
-        LOG.info("Retrieved {} total tools from {} MCP servers", allTools.size(), mcpClients.size());
+        out.printf("Retrieved %d total tools from %d MCP servers%n", allTools.size(), mcpClients.size());
         return allTools;
     }
 
