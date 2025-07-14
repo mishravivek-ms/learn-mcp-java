@@ -9,11 +9,7 @@ import static java.lang.System.err;
 @Command(name = "chat", description = "Start a chat session with Ollama LLM")
 public class ChatCommand implements Runnable {
 
-    ChatService chatService;
-
-    public ChatCommand() {
-        chatService = new ChatService();
-    }
+    ChatService chatService = new ChatService();
 
     @Override
     public void run() {

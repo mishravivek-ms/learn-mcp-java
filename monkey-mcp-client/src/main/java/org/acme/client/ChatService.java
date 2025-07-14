@@ -44,10 +44,11 @@ public class ChatService {
                             .build())
                     .build();
 
-            out.println("Chat service initialized with Ollama model and " +
-                    toolsService.getAvailableTools().size() + " MCP tools");
+            out.printf("✓ Chat service initialized with Ollama model and %d MCP tool%s%n",
+                    toolsService.getAvailableTools().size(),
+                    toolsService.getAvailableTools().size() == 1 ? "" : "s");
         } catch (Exception e) {
-            err.println("Failed to initialize chat service: " + e.getMessage());
+            err.println("✗ Failed to initialize chat service: " + e.getMessage());
             e.printStackTrace(System.err);
         }
     }
@@ -56,19 +57,29 @@ public class ChatService {
         try {
             return bot.chat(DEFAULT_USER_ID, message);
         } catch (Exception e) {
-            err.println("Error during chat interaction: " + e.getMessage());
+            err.println("✗ Error during chat interaction: " + e.getMessage());
             e.printStackTrace(System.err);
             return "Sorry, I encountered an error while processing your message.";
         }
     }
 
     public void startInteractiveChat() {
-        out.println("=== Monkey MCP Chat ===");
-        out.println("Starting chat with Ollama (llama3.2) + MCP Tools");
-        out.println("Available tools: " + toolsService.getAvailableTools().size() + " monkey species tools");
+        out.println();
+        out.println("═══════════════════════════════════");
+        out.println("      Monkey MCP Chat");
+        out.println("═══════════════════════════════════");
+        out.println("→ Starting chat with Ollama (llama3.2) + MCP Tools");
+        out.printf("→ Available tools: %d monkey species tool%s%n", 
+            toolsService.getAvailableTools().size(),
+            toolsService.getAvailableTools().size() == 1 ? "" : "s");
+        out.println();
+        out.println("💡 Try asking:");
+        out.println("   • 'What monkey species do you know?'");
+        out.println("   • 'Tell me about a random monkey'");
+        out.println();
         out.println("Type 'exit', 'quit', or 'bye' to end the conversation");
-        out.println("Try asking: 'What monkey species do you know?' or 'Tell me about a random monkey'");
-        out.println("================================================================\n");
+        out.println("───────────────────────────────────");
+        out.println();
 
         try (var scanner = new Scanner(System.in)) {
             while (true) {
@@ -81,7 +92,7 @@ public class ChatService {
 
                 switch (input.toLowerCase()) {
                     case "exit", "quit", "bye" -> {
-                        out.println("Goodbye! 👋");
+                        out.println("👋 Goodbye!");
                         return;
                     }
                 }

@@ -10,9 +10,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -24,20 +21,18 @@ import dev.langchain4j.mcp.client.transport.http.HttpMcpTransport;
 
 public class ToolsService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ToolsService.class);
-
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final List<McpClient> mcpClients = new ArrayList<>();
     private McpToolProvider toolProvider;
 
     public ToolsService() {
-        out.println("Initializing MCP tools service...");
+        out.println("→ Initializing MCP tools service...");
         try {
             registerMCPServers();
             initializeToolProvider();
-            out.println("MCP tools service initialized successfully");
+            out.println("✓ MCP tools service initialized successfully");
         } catch (Exception e) {
-            err.printf("Failed to initialize MCP tools service: %s%n", e.getMessage());
+            err.printf("✗ Failed to initialize MCP tools service: %s%n", e.getMessage());
         }
     }
 
@@ -45,7 +40,7 @@ public class ToolsService {
         var inputStream = getMcpConfigStream();
 
         if (inputStream == null) {
-            out.println("mcp.json configuration file not found in working directory or resources");
+            out.println("⚠ mcp.json configuration file not found in working directory or resources");
             return;
         }
 
@@ -54,7 +49,7 @@ public class ToolsService {
             var servers = config.get("servers");
 
             if (servers == null || !servers.isObject()) {
-                out.println("No servers configuration found in mcp.json");
+                out.println("⚠ No servers configuration found in mcp.json");
                 return;
             }
 
@@ -62,14 +57,14 @@ public class ToolsService {
                 try {
                     registerServer(serverName, servers.get(serverName));
                 } catch (Exception e) {
-                    err.printf("Failed to register MCP server: %s%n", serverName);
+                    err.printf("✗ Failed to register MCP server: %s%n", serverName);
                 }
             });
 
-            out.printf("MCP server registration completed. %d servers registered%n", mcpClients.size());
-
+            out.printf("✓ MCP server registration completed. %d server%s registered%n", 
+                mcpClients.size(), mcpClients.size() == 1 ? "" : "s");
         } catch (IOException e) {
-            err.printf("Failed to read mcp.json configuration: %s%n", e.getMessage());
+            err.printf("✗ Failed to read mcp.json configuration: %s%n", e.getMessage());
         }
     }
 
@@ -77,16 +72,16 @@ public class ToolsService {
         var workingDirConfig = Paths.get("mcp.json");
         if (Files.exists(workingDirConfig)) {
             try {
-                out.printf("Loading mcp.json from working directory: %s%n", workingDirConfig.toAbsolutePath());
+                out.printf("→ Loading mcp.json from working directory: %s%n", workingDirConfig.toAbsolutePath());
                 return Files.newInputStream(workingDirConfig);
             } catch (IOException e) {
-                err.printf("Failed to read mcp.json from working directory, falling back to bundled resource: %s%n", e.getMessage());
+                err.printf("✗ Failed to read mcp.json from working directory, falling back to bundled resource: %s%n", e.getMessage());
             }
         }
 
         var resourceStream = getClass().getClassLoader().getResourceAsStream("mcp.json");
         if (resourceStream != null) {
-            out.println("Loading mcp.json from bundled resource");
+            out.println("→ Loading mcp.json from bundled resource");
         }
         return resourceStream;
     }
@@ -97,11 +92,11 @@ public class ToolsService {
             var type = serverConfig.get("type").asText();
 
             if (!"sse".equals(type)) {
-                err.printf("Unsupported transport type '%s' for server: %s%n", type, serverName);
+                err.printf("✗ Unsupported transport type '%s' for server: %s%n", type, serverName);
                 return;
             }
 
-            out.printf("Registering MCP server: %s with URL: %s%n", serverName, url);
+            out.printf("→ Registering MCP server: %s with URL: %s%n", serverName, url);
 
             var mcpTransport = new HttpMcpTransport.Builder()
                     .sseUrl(url)
@@ -115,16 +110,16 @@ public class ToolsService {
                     .build();
 
             mcpClients.add(mcpClient);
-            out.printf("Successfully registered MCP server: %s%n", serverName);
+            out.printf("✓ Successfully registered MCP server: %s%n", serverName);
 
         } catch (Exception e) {
-            err.printf("Failed to register MCP server: %s%n", serverName);
+            err.printf("✗ Failed to register MCP server: %s%n", serverName);
         }
     }
 
     private void initializeToolProvider() {
         if (mcpClients.isEmpty()) {
-            out.println("No MCP clients registered, tool provider will be empty");
+            out.println("⚠ No MCP clients registered, tool provider will be empty");
             return;
         }
 
@@ -132,7 +127,8 @@ public class ToolsService {
                 .mcpClients(mcpClients.toArray(new McpClient[0]))
                 .build();
 
-        out.printf("Tool provider initialized with %d MCP clients%n", mcpClients.size());
+        out.printf("✓ Tool provider initialized with %d MCP client%s%n", 
+            mcpClients.size(), mcpClients.size() == 1 ? "" : "s");
     }
 
     public List<ToolSpecification> getAvailableTools() {
@@ -142,13 +138,16 @@ public class ToolsService {
             try {
                 var clientTools = client.listTools();
                 allTools.addAll(clientTools);
-                out.printf("Retrieved %d tools from MCP server: %s%n", clientTools.size(), client.key());
+                out.printf("✓ Retrieved %d tool%s from MCP server: %s%n", 
+                    clientTools.size(), clientTools.size() == 1 ? "" : "s", client.key());
             } catch (Exception e) {
-                out.printf("Failed to get tools from MCP server: %s%n", client.key());
+                out.printf("✗ Failed to get tools from MCP server: %s%n", client.key());
             }
         }
 
-        out.printf("Retrieved %d total tools from %d MCP servers%n", allTools.size(), mcpClients.size());
+        out.printf("→ Retrieved %d total tool%s from %d MCP server%s%n", 
+            allTools.size(), allTools.size() == 1 ? "" : "s",
+            mcpClients.size(), mcpClients.size() == 1 ? "" : "s");
         return allTools;
     }
 
