@@ -42,7 +42,7 @@ Now that your project is set up, let's use GitHub Copilot to help us implement t
 
 #### Provide GitHub Copilot Instructions for better context
 
-Create the folder `.github` and inside it create a file named `copilot-instructions.md` with the following content:
+Create a file named `quarkus-mcp-server.instructions.md` with the following content:
 
 ```markdown
     # Quarkus MCP Server
