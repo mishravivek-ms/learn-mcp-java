@@ -7,10 +7,16 @@ import picocli.CommandLine.Command;
 @Command(name = "chat", description = "Start a chat session")
 public class ChatCommand implements Runnable {
 
+    ChatService chatService = new ChatService();
+
     @Override
     public void run() {
-        var chatService = new ChatService();
-        chatService.startInteractiveChat();
+        if (chatService.isAvailable()) {
+            chatService.startInteractiveChat();
+        } else {
+            System.err.println("✗ Chat service is not available. Please check the Ollama model connection.");
+        }
+
     }
 
 }

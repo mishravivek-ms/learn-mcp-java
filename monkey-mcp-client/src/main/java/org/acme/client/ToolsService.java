@@ -5,10 +5,6 @@ import static java.lang.System.out;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Duration;
@@ -30,18 +26,18 @@ public class ToolsService {
     private McpToolProvider toolProvider;
 
     public ToolsService() {
-        out.println("→ Initializing MCP tools service...");
+        out.println("→ Initializing MCP tools...");
         try {
             registerMCPServers();
             initializeToolProvider();
-            out.println("✓ MCP tools service initialized successfully");
+            out.println("✓ MCP tools initialized successfully");
         } catch (Exception e) {
-            err.printf("✗ Failed to initialize MCP tools service: %s%n", e.getMessage());
+            err.printf("✗ Failed to initialize MCP tools: %s%n", e.getMessage());
         }
     }
 
     private void registerMCPServers() {
-        var inputStream = getMcpConfigStream();
+        var inputStream = getConfigurationFile();
 
         if (inputStream == null) {
             out.println("⚠ mcp.json configuration file not found in working directory or resources");
@@ -62,14 +58,14 @@ public class ToolsService {
                 registerServer(serverName, servers.get(serverName));
             });
 
-            out.printf("✓ MCP server registration completed. %d server%s registered%n",
-                    mcpClients.size(), mcpClients.size() == 1 ? "" : "s");
+            out.printf("✓ MCP server registration completed. %d server(s) registered%n",
+                    mcpClients.size());
         } catch (IOException e) {
             err.printf("✗ Failed to read mcp.json configuration: %s%n", e.getMessage());
         }
     }
 
-    private InputStream getMcpConfigStream() {
+    private InputStream getConfigurationFile() {
         var workingDirConfig = Paths.get("mcp.json");
         if (Files.exists(workingDirConfig)) {
             try {
@@ -89,26 +85,26 @@ public class ToolsService {
     }
 
     private void registerServer(String serverName, JsonNode serverConfig) {
+        out.printf("→ Processing server registration: %s%n", serverName);
+
         try {
             var url = serverConfig.get("url").asText();
             var type = serverConfig.get("type").asText();
+
+            out.printf("  URL: %s, Type: %s%n", url, type);
 
             if (!"sse".equals(type)) {
                 err.printf("✗ Unsupported transport type '%s' for server: %s%n", type, serverName);
                 return;
             }
 
-            // Check if server is available before attempting registration
-            if (!isServerAvailable(url)) {
-                out.printf("⚠ MCP server '%s' is not responding, skipping registration%n", serverName);
-                return;
-            }
-
             out.printf("→ Registering MCP server: %s with URL: %s%n", serverName, url);
 
+            // Configure SSE transport with longer timeouts to prevent connection issues
             var mcpTransport = new HttpMcpTransport.Builder()
                     .sseUrl(url)
-                    .logRequests(false) // Disable logging for better performance
+                    .timeout(Duration.ofSeconds(60)) // Increased timeout for SSE connections
+                    .logRequests(false)
                     .logResponses(false)
                     .build();
 
@@ -119,9 +115,8 @@ public class ToolsService {
 
             mcpClients.add(mcpClient);
             out.printf("✓ Successfully registered MCP server: %s%n", serverName);
-
-        } catch (Exception e) {
-            err.printf("✗ Failed to register MCP server: %s%n", serverName);
+        } catch (RuntimeException e) {
+            err.printf("✗ Failed to register MCP server: %s - %s%n", serverName, e.getMessage());
         }
     }
 
@@ -132,24 +127,34 @@ public class ToolsService {
         }
 
         toolProvider = McpToolProvider.builder()
-                .mcpClients(mcpClients.toArray(new McpClient[0]))
+                .mcpClients(mcpClients.toArray(new McpClient[mcpClients.size()]))
                 .build();
 
-        out.printf("✓ Tool provider initialized with %d MCP client%s%n",
-                mcpClients.size(), mcpClients.size() == 1 ? "" : "s");
+        out.printf("✓ Tool provider initialized with %d MCP client(s)%n",
+                mcpClients.size());
     }
 
     public List<ToolSpecification> getAvailableTools() {
         var allTools = new ArrayList<ToolSpecification>();
 
         for (var client : mcpClients) {
-            var clientTools = client.listTools();
-            allTools.addAll(clientTools);
-            out.printf("✓ Retrieved %d tool%s from MCP server: %s%n",
-                    clientTools.size(), clientTools.size() == 1 ? "" : "s", client.key());
+            try {
+                out.printf("→ Retrieving tools from MCP server: %s%n", client.key());
+                var clientTools = client.listTools();
+                allTools.addAll(clientTools);
+                out.printf("✓ Retrieved %d tool(s) from MCP server: %s%n",
+                        clientTools.size(), client.key());
+            } catch (Exception e) {
+                err.printf("⚠ Failed to get tools from MCP server: %s - %s%n", client.key(), e.getMessage());
+                // Don't print full stack trace for common connection issues
+                if (!(e.getCause() instanceof java.net.SocketTimeoutException)) {
+                    err.printf("  Full error details: %s%n", e.toString());
+                }
+            }
         }
 
-        out.printf("→ Retrieved %d total tool(s) from %d MCP server(s)%n", allTools.size(), mcpClients.size());
+        out.printf("→ Retrieved %d total tool(s) from %d MCP server(s)%n",
+                allTools.size(), mcpClients.size());
         return allTools;
     }
 
@@ -157,22 +162,18 @@ public class ToolsService {
         return toolProvider;
     }
 
-    private boolean isServerAvailable(String url) {
-        try {
-            var client = HttpClient.newBuilder()
-                    .build();
-
-            var request = HttpRequest.newBuilder()
-                    .uri(URI.create(url))
-                    .timeout(Duration.ofSeconds(1))
-                    .GET()
-                    .build();
-
-            var response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            return response.statusCode() < 500; // Accept any non-server error status
-        } catch (Exception e) {
-            return false;
-        }
+    public void shutdown() {
+        out.println("→ Shutting down MCP tools service...");
+        mcpClients.forEach(t -> {
+            try {
+                t.close();
+            } catch (Exception e) {
+                err.printf("✗ Failed to close MCP client %s: %s%n", t.key(), e.getMessage());
+            } finally {
+                out.printf("✓ MCP client %s closed%n", t.key());
+            }
+        });
+        out.println("✓ All MCP clients closed");
     }
 
 }

@@ -2,30 +2,52 @@ package org.acme.client;
 
 import static java.lang.System.out;
 
+import java.time.Duration;
+import java.util.List;
 import java.util.Scanner;
+import java.util.UUID;
 
-import org.acme.model.Bot;
-
+import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.model.ollama.OllamaChatModel;
 import dev.langchain4j.service.AiServices;
+import dev.langchain4j.service.MemoryId;
+import dev.langchain4j.service.SystemMessage;
+import dev.langchain4j.service.UserMessage;
 import dev.langchain4j.store.memory.chat.InMemoryChatMemoryStore;
 
 public class ChatService {
 
-    private static final String DEFAULT_USER_ID = "default-user";
+    private static final String SUUID = UUID.randomUUID().toString().substring(0, 8);
+    private static final String RANDOM_USER = "user-" + SUUID;
 
     private Bot bot;
 
+    private OllamaChatModel chatModel;
+
+    private ToolsService toolsService = new ToolsService();
+
+    interface Bot {
+
+        @SystemMessage("""
+                You are a helpful AI assistant with access to various information tools.
+                You can answer questions about anything users ask and help with various tasks.
+                Use the available tools to provide accurate and up to date information.
+                """)
+        String chat(@MemoryId String memoryId, @UserMessage String message);
+
+        String chat(List<ChatMessage> messages);
+    }
+
     public ChatService() {
-        var chatModel = OllamaChatModel.builder()
+        chatModel = OllamaChatModel.builder()
                 .baseUrl("http://localhost:11434")
                 .modelName("llama3.2")
+                .timeout(Duration.ofSeconds(10))
                 .temperature(0.7)
                 .build();
 
         var chatMemoryStore = new InMemoryChatMemoryStore();
-        var toolsService = new ToolsService();
 
         bot = AiServices.builder(Bot.class)
                 .chatModel(chatModel)
@@ -37,8 +59,21 @@ public class ChatService {
                         .build())
                 .build();
 
-        out.printf("✓ Chat initialized with Ollama model and %d MCP tool(s)",
+        // Initialize the chat model and check if it's available
+        try {
+            bot.chat("health-check", "Say YES if you are ready to chat");
+        } catch (RuntimeException e) {
+            out.println("✗ Failed to connect to Ollama model: " + e.getMessage());
+            chatModel = null;
+            return;
+        }
+
+        out.printf("✓ Chat initialized!",
                 toolsService.getAvailableTools().size());
+    }
+
+    public boolean isAvailable() {
+        return chatModel != null && bot != null;
     }
 
     public void startInteractiveChat() {
@@ -52,35 +87,35 @@ public class ChatService {
                 if (input.isEmpty()) {
                     continue;
                 }
-
                 switch (input.toLowerCase()) {
                     case "exit", "quit", "bye" -> {
                         out.println("👋 Goodbye!");
+                        toolsService.shutdown();
                         return;
                     }
                 }
 
-                var response = bot.chat(DEFAULT_USER_ID, input);
-
+                var response = bot.chat(RANDOM_USER, input);
                 out.printf("AI: %s\n", response);
             }
         }
     }
 
     private void printInfo() {
-        out.println();
-        out.println("═══════════════════════════════════");
-        out.println("      Monkey MCP Chat");
-        out.println("═══════════════════════════════════");
-        out.println("→ Starting chat with Ollama (llama3.2) + MCP Tools");
-        out.println();
-        out.println("💡 Try asking:");
-        out.println("   • 'What monkey species do you know?'");
-        out.println("   • 'Tell me about a random monkey'");
-        out.println();
-        out.println("Type 'exit', 'quit', or 'bye' to end the conversation");
-        out.println("───────────────────────────────────");
-        out.println();
+        out.println("""
+                ════════════════════════════════════
+                      Java MCP Chat Client
+                ════════════════════════════════════
+                → Starting chat with local Ollama (llama3.2) + MCP Tools
+
+                💡 Try asking:
+
+                   • 'What monkey species do you know?'
+                   • 'Tell me about a random monkey'
+
+                Type 'exit', 'quit', or 'bye' to end the conversation
+                ───────────────────────────────------------------────
+                """);
     }
 
 }
