@@ -1,6 +1,5 @@
 package org.acme.command;
 
-import static java.lang.System.err;
 import static java.lang.System.out;
 
 import java.util.function.Consumer;
