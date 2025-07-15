@@ -5,8 +5,13 @@ import static java.lang.System.out;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -93,6 +98,12 @@ public class ToolsService {
                 return;
             }
 
+            // Check if server is available before attempting registration
+            if (!isServerAvailable(url)) {
+                out.printf("⚠ MCP server '%s' is not responding, skipping registration%n", serverName);
+                return;
+            }
+
             out.printf("→ Registering MCP server: %s with URL: %s%n", serverName, url);
 
             var mcpTransport = new HttpMcpTransport.Builder()
@@ -144,6 +155,24 @@ public class ToolsService {
 
     public McpToolProvider getToolProvider() {
         return toolProvider;
+    }
+
+    private boolean isServerAvailable(String url) {
+        try {
+            var client = HttpClient.newBuilder()
+                    .build();
+
+            var request = HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .timeout(Duration.ofSeconds(1))
+                    .GET()
+                    .build();
+
+            var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            return response.statusCode() < 500; // Accept any non-server error status
+        } catch (Exception e) {
+            return false;
+        }
     }
 
 }
