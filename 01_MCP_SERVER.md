@@ -126,12 +126,6 @@ Now, you can ask GitHub Copilot to help you implement the MCP server by providin
     Add a few fictional species with different attributes.
 ```
 
-Perfect, now let's test our MCP server with the MCP Inspector tool.
-
-```bash
-npx @modelcontextprotocol/inspector
-```
-
 ### Expected Server Output
 When the server starts with `./mvnw quarkus:dev`, you should see:
 ```
@@ -142,6 +136,20 @@ __  ____  __  _____   ___  __ ____  ______
 INFO  [io.quarkus] (Quarkus Main Thread) monkey-mcp-server 1.0.0-SNAPSHOT on JVM started in 2.345s
 INFO  [io.quarkus] (Quarkus Main Thread) Profile dev activated. Live Coding activated.
 INFO  [io.quarkus] (Quarkus Main Thread) Installed features: [mcp-server-sse, rest-client-jackson, qute]
+```
+
+### Testing the MCP Server with MCP Inspector
+
+To test your MCP server, you can use the [MCP Inspector](https://github.com/modelcontextprotocol/inspector).
+
+```bash
+npx @modelcontextprotocol/inspector
+```
+
+Point the MCP Inspector to your server URL:
+
+```
+http://localhost:8080/mcp/sse
 ```
 
 ### ✅ Final Validation
