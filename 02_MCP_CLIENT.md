@@ -1,8 +1,52 @@
 # Part 3: Building Your Own MCP Client Application
 
-> **Navigation**: [← Back to MCP Server](01_MCP_SERVER.md) | [Back to Overview](README.md)
+> **Navigation**: [← Back to MCP Server](01_MCP_SERVER.md) | [Back to Overview](READM```bash
+# List all available MCP tools
+./mvnw quarkus:dev -Dquarkus.args="tools"
 
-## Overview
+# Start interactive chat with AI assistant
+./mvnw quarkus:dev -Dquarkus.args="chat"
+
+# Show help
+./mvnw quarkus:dev -Dquarkus.args="help"
+```
+
+### Interactive Chat Mode
+Start an interactive chat session with the AI assistant:
+
+```bash
+./mvnw quarkus:dev -Dquarkus.args="chat"
+```
+
+Example conversation:
+```
+=== Monkey MCP Chat ===
+Starting chat with Ollama (llama3.2) + MCP Tools
+Available tools: 4 monkey species tools
+Type 'exit', 'quit', or 'bye' to end the conversation
+================================================================
+
+You: What monkey species do you know?
+AI: I can help you with monkey species information! Let me check what species are available...
+
+[AI calls list_monkey_species tool]
+
+I have information about several monkey species including:
+- Proboscis Monkey (Borneo)
+- Golden Snub-nosed Monkey (China)
+- Mandrill (Central Africa)
+- Howler Monkey (Central/South America)
+- Spider Monkey (Central/South America)
+
+Would you like to know more details about any specific species?
+
+You: Tell me about the Proboscis Monkey
+AI: Let me get detailed information about the Proboscis Monkey...
+
+[AI calls get_monkey_details tool with "Proboscis Monkey"]
+```
+
+### Using the MCP Client
 
 In this section, you'll learn how to build an MCP client application using Quarkus that can communicate with the monkey species MCP server you just created. This console application will demonstrate how to:
 
@@ -10,6 +54,13 @@ In this section, you'll learn how to build an MCP client application using Quark
 - List available MCP tools from the server
 - Call MCP tools with parameters
 - Handle responses and display results
+
+## 🎯 What You'll Learn
+- How to create a console application with Quarkus and PicoCLI
+- How to implement MCP client-server communication
+- How to integrate LangChain4j with Ollama for AI chat
+- How to register and use MCP servers from configuration
+- How to handle JSON message parsing and error handling
 
 ## Step-by-Step Walkthrough
 
@@ -38,6 +89,22 @@ code .
 
 - Ensure the Java Extension Pack is installed and active
 - Verify that the project builds successfully with `./mvnw verify`
+
+### Client Configuration
+Create a `mcp.json` file in your project root with the following content:
+
+```json
+{
+  "servers": {
+    "monkey-server": {
+      "type": "sse",
+      "url": "http://localhost:8080/mcp/sse"
+    }
+  }
+}
+```
+
+This configuration file tells the client where to find your MCP server and what transport protocol to use.
 
 ### Build the MCP Client using GitHub Copilot
 
@@ -208,8 +275,20 @@ Your MCP client can now:
 
 This foundation can be extended to build more sophisticated MCP clients, including graphical applications, web interfaces, or integration with other systems.
 
+### 🎉 Tutorial Complete!
+
+You've successfully built:
+- ✅ A Quarkus-based MCP server with monkey species data
+- ✅ An interactive CLI client using LangChain4j
+- ✅ Integration with Ollama for AI chat capabilities
+- ✅ GitHub Copilot integration for enhanced development
+
+### Next Steps
+- Explore adding more MCP tools to your server
+- Implement authentication and security
+- Deploy your applications to production
+- Contribute to the MCP ecosystem
+
 ---
 
-> **Next Step**: Explore advanced MCP topics like authentication, custom transports, and server clustering.
-
-**Continue to**: [Part 4 - Advanced MCP Topics →](03_ADVANCED_TOPICS.md)
+> **Congratulations!** You've completed the Monkey MCP Java tutorial series.

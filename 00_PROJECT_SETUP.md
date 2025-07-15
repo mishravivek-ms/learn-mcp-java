@@ -2,6 +2,10 @@
 
 > **Navigation**: [← Back to Overview](README.md) | [Next: Part 2 - MCP Server →](01_MCP_SERVER.md)
 
+## ⏱️ Time Estimate
+- **Setup time**: 10-30 minutes
+- **Tutorial completion**: 60-75 minutes
+
 ## What You'll Need
 Before diving into MCP development with Java and Quarkus, ensure you have the following tools installed:
 
@@ -11,6 +15,7 @@ Before diving into MCP development with Java and Quarkus, ensure you have the fo
 
 ### 2. Java 21
 - Install [Microsoft Build of OpenJDK 21](https://microsoft.com/openjdk/) or a Java 21 compatible JDK
+- **Minimum version**: Java 21.0.0
 - Verify installation: `java --version`
 - Ensure JAVA_HOME environment variable is set correctly
 
@@ -52,6 +57,25 @@ ollama pull llama3.2
 - [ ] Docker Desktop installed and running
 - [ ] Ollama installed with llama3.2 model
 - [ ] Basic understanding of MCP concepts
+
+## Common Setup Issues
+
+### Java Issues
+- **JAVA_HOME not set**: Add `export JAVA_HOME=/path/to/java` to your shell profile (.bashrc, .zshrc)
+- **Wrong Java version**: Use `java --version` to verify you have Java 21+
+- **Multiple Java versions**: Use `update-alternatives` (Linux) or `jenv` (macOS) to manage versions
+
+### Quarkus CLI Issues
+- **Command not found**: Ensure Quarkus CLI is in your PATH
+- **Version mismatch**: Update with `quarkus --version` and reinstall if needed
+
+### Docker Issues
+- **Docker Desktop not starting**: Check system requirements and available disk space
+- **Permission denied**: Ensure your user is in the docker group (Linux/macOS)
+
+### Ollama Issues
+- **Model not found**: Run `ollama pull llama3.2` to download the model
+- **Connection refused**: Ensure Ollama is running with `ollama serve`
 
 ## What is Model Context Protocol (MCP)?
 

@@ -7,6 +7,13 @@
 In this section, you'll learn how to build an MCP server with a fun monkey-themed use case.
 This hands-on tutorial will teach you how MCP servers are implemented using Java and Quarkus.
 
+## 🎯 What You'll Learn
+- How to create a Quarkus MCP server with HTTP SSE transport
+- How to implement MCP tools with proper annotations
+- How to test your server with MCP Inspector
+- How to integrate with GitHub Copilot for enhanced development
+- How to structure a production-ready MCP server
+
 ## Step-by-Step Walkthrough
 
 ### Create a new Java and Quarkus project
@@ -38,6 +45,11 @@ code monkey-mcp-server
 
 - Ensure the Java Extension Pack is installed and active
 - Verify that the project builds successfully with `./mvnw verify`
+
+### ✅ Validation Checkpoint
+- [ ] Project builds successfully with `./mvnw verify`
+- [ ] No compilation errors in VS Code
+- [ ] Quarkus extensions are properly loaded
 
 ### Build the MCP Server using GitHub Copilot
 Now that your project is set up, let's use GitHub Copilot to help us implement the MCP Server application.
@@ -96,12 +108,12 @@ Now, you can ask GitHub Copilot to help you implement the MCP server by providin
 ```plaintext
     Implement an MCP server with HTTP SSE protocol, using Quarkus, that will have the following capabilities (tools):
 
-    - List monkeys species
-    - Get details for a specific monkey species
-    - Get a random monkey species
-    - Get statistics about the monkey species data set
+    - **list_monkey_species**: Returns all available monkey species
+    - **get_monkey_details**: Takes species name as parameter, returns detailed information
+    - **get_random_monkey**: Returns a random monkey species
+    - **get_monkey_statistics**: Returns dataset statistics (total count, most accessed, etc.)
     
-    A monkey species has the following data, as example.
+    A monkey species has the following data, as example:
 
     - Species Name: Proboscis Monkey
     - Location: Borneo
@@ -119,6 +131,24 @@ Perfect, now let's test our MCP server with the MCP Inspector tool.
 ```bash
 npx @modelcontextprotocol/inspector
 ```
+
+### Expected Server Output
+When the server starts with `./mvnw quarkus:dev`, you should see:
+```
+__  ____  __  _____   ___  __ ____  ______
+ --/ __ \/ / / / _ | / _ \/ //_/ / / / __/
+ -/ /_/ / /_/ / __ |/ , _/ ,< / /_/ /\ \
+--\___\_\____/_/ |_/_/|_/_/|_|\____/___/
+INFO  [io.quarkus] (Quarkus Main Thread) monkey-mcp-server 1.0.0-SNAPSHOT on JVM started in 2.345s
+INFO  [io.quarkus] (Quarkus Main Thread) Profile dev activated. Live Coding activated.
+INFO  [io.quarkus] (Quarkus Main Thread) Installed features: [mcp-server-sse, rest-client-jackson, qute]
+```
+
+### ✅ Final Validation
+- [ ] MCP server starts on port 8080
+- [ ] MCP Inspector can connect to `http://localhost:8080/mcp/sse`
+- [ ] All 4 monkey tools are available and functional
+- [ ] GitHub Copilot can access monkey species data
 
 Next, configure the Monkey MCP Server in your Visual Studio Code environment by creating a `.vscode/mcp.json` file with the following content:
 
@@ -150,4 +180,4 @@ This hands-on experience has given you a solid understanding of how to implement
 
 > **Next Step**: Let's implement an MCP Client application, using GitHub Copilot, that talks to the MCP Server that we just built.
 
-**Continue to**: [Part 3 - Building Your Own MCP Client →](03_MCP_CLIENT.md)
+**Continue to**: [Part 3 - Building Your Own MCP Client →](02_MCP_CLIENT.md)
