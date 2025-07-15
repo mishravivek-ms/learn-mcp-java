@@ -112,29 +112,26 @@ Now that your project is set up, let's use GitHub Copilot to help us implement t
 
 #### Provide GitHub Copilot Instructions for better context
 
-Create the folder `.github` and inside it create a file named `copilot-instructions.md` with the following content:
+Create a file named `java-cli-mcp-client.instructions.md` with the following content:
 
 ```markdown
-      # Quarkus Console Application to interact with AI and MCP Servers
+      # Console Application to interact with AI and MCP Servers
 
-      Build a console app with Java 21, Quarkus, and LangChain4J with Ollama for chat interactions that also registers MCP servers for additional tools.
+      Build a console app with Java 21, Picocli, and LangChain4J with Ollama for chat interactions that also registers MCP servers for additional tools.
 
+      - Use Picocli version 4.7.7
+      - Use LangChain4J version 1.1.0-rc1
       - Use LangChain4J API to interact with Ollama LLMs
       - Use LangChain4J to register MCP servers and their tools based on the `mcp.json` file in the current directory
       - Use LLangChain4J to list available tools from the registered MCP servers
       - Use LangChain4J to chat with the Ollama LLM 
 
       ## Stack
-      - Java 21 with Quarkus Framework
+      - Java 21 
       - Picocli for console application interface
       - LangChain4J for chat interactions and MCP client support
       - Ollama LLMs for AI chat
       - Register provided MCP servers in the `mcp.json` file
-
-      ## Quick Start
-      ```bash
-      quarkus create app --no-code -x picocli,langchain4j-ollama monkey-mcp-client
-      ```
 
       ## Structure
       - Use standard Java naming conventions (PascalCase classes, camelCase methods)
@@ -143,14 +140,19 @@ Create the folder `.github` and inside it create a file named `copilot-instructi
       - Add Javadoc for public methods
 
       ## Features
-      - Chat with Ollama LLM using LangChain4J
-      - Register MCP servers from the `mcp.json` file in the current directory
+      - Automatically registers MCP servers from the `mcp.json` file in the current directory
       - List available tools from the server
+      - Chat with Ollama LLM using LangChain4J
 
       ## Console Commands
       - `tools` - List all available MCP tools from registered servers in `mcp.json`
       - `chat` - Start a chat session with the default Ollama model llama3.2
       - `help` - Show help for available commands
+
+      ## Maven
+      - Use Maven for build and dependency management
+      - Configure Maven to build an uber jar for easy command-line execution
+      - Generate a run.sh script for easy execution, and pass arguments to the main class
 ```
 
 Now, you can ask GitHub Copilot to help you implement the MCP client by providing it with the following prompt:
@@ -172,7 +174,8 @@ First, make sure your MCP server is running. In the `monkey-mcp-server` director
 Then, in a new terminal, navigate to your MCP client directory and run:
 
 ```bash
-./mvnw quarkus:dev
+chmod +x run.sh
+./run.sh
 ```
 
 ### Using the MCP Client
@@ -180,64 +183,14 @@ Then, in a new terminal, navigate to your MCP client directory and run:
 Once the client is running, you can use the following commands:
 
 ```bash
-# List all available MCP tools
-./mvnw quarkus:dev -Dquarkus.args="list-tools"
-
-# List all monkey species
-./mvnw quarkus:dev -Dquarkus.args="list-monkeys"
-
-# Get details for a specific monkey species
-./mvnw quarkus:dev -Dquarkus.args="get-monkey 'Proboscis Monkey'"
-
-# Get a random monkey species
-./mvnw quarkus:dev -Dquarkus.args="random-monkey"
-
 # Show help
-./mvnw quarkus:dev -Dquarkus.args="help"
-```
+./run.sh -h
 
-### Building a Native Executable (Optional)
+# List all available MCP tools
+./run.sh tools
 
-For faster startup and lower memory usage, you can build a native executable:
-
-```bash
-./mvnw package -Pnative
-```
-
-Then run the native executable:
-
-```bash
-./target/monkey-mcp-client-1.0.0-SNAPSHOT-runner list-monkeys
-```
-
-### Expected Output
-
-When you run the `list-monkeys` command, you should see output similar to:
-
-```
-🐵 Monkey Species List:
-====================
-1. Proboscis Monkey (Borneo)
-2. Golden Snub-nosed Monkey (China)
-3. Mandrill (Central Africa)
-4. Howler Monkey (Central/South America)
-5. Spider Monkey (Central/South America)
-
-Total species: 5
-```
-
-When you run `get-monkey "Proboscis Monkey"`, you should see:
-
-```
-🐵 Proboscis Monkey Details:
-==========================
-Species: Proboscis Monkey
-Location: Borneo
-Population: 15,000
-Coordinates: 0.961883, 114.55485
-Accessed: 2 times
-
-Details: The proboscis monkey or long-nosed monkey, known as the bekantan in Malay, is a reddish-brown arboreal Old World monkey that is endemic to the south-east Asian island of Borneo.
+# Start chat with the AI assistant
+./run.sh chat
 ```
 
 ## Troubleshooting
@@ -247,11 +200,10 @@ Details: The proboscis monkey or long-nosed monkey, known as the bekantan in Mal
 1. **Connection refused**: Make sure the MCP server is running on `http://localhost:8080`
 2. **JSON parsing errors**: Verify the server is returning valid MCP protocol messages
 3. **Command not found**: Check that Picocli commands are properly annotated
-4. **SSL/TLS issues**: For HTTPS connections, ensure certificates are properly configured
 
 ### Debugging Tips
 
-- Use `./mvnw quarkus:dev -Dquarkus.log.level=DEBUG` for detailed logging
+- Debug from Visual Studio Code using the Java debugger starting with the main class
 - Check the server logs for any errors
 - Use the MCP Inspector tool to verify server responses: `npx @modelcontextprotocol/inspector`
 - Test individual HTTP requests using curl or Postman
