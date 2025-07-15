@@ -29,13 +29,7 @@ Before diving into MCP development with Java and Quarkus, ensure you have the fo
 - Enables quick project creation and development commands
 - Verify installation: `quarkus --version`
 
-### 5. Docker Desktop
-- Download and install [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-- Required for containerized development and deployment
-- Verify installation: `docker --version`
-- Ensure Docker Desktop is running before starting development
-
-### 6. Ollama LLM Locally
+### 5. Ollama LLM Locally
 - Install [Ollama](https://ollama.com/) to run LLM models locally
 - Pull the `llama3.2` model for MCP tooling support
 ```bash
@@ -43,18 +37,11 @@ ollama pull llama3.2
 ```
 - Start the Ollama server: `ollama serve`
 
-### 6. Understanding MCP
-- What is Model Context Protocol?
-- How MCP Servers work with AI assistants
-- The client-server architecture with STDIO protocol
-- Use cases and benefits for monkey species management
-
 ## Environment Verification
 - [ ] VS Code installed and running
 - [ ] Java 21 installed and JAVA_HOME configured
 - [ ] Extension Pack for Java active in VS Code
 - [ ] Quarkus CLI installed
-- [ ] Docker Desktop installed and running
 - [ ] Ollama installed with llama3.2 model
 - [ ] Basic understanding of MCP concepts
 
@@ -68,10 +55,6 @@ ollama pull llama3.2
 ### Quarkus CLI Issues
 - **Command not found**: Ensure Quarkus CLI is in your PATH
 - **Version mismatch**: Update with `quarkus --version` and reinstall if needed
-
-### Docker Issues
-- **Docker Desktop not starting**: Check system requirements and available disk space
-- **Permission denied**: Ensure your user is in the docker group (Linux/macOS)
 
 ### Ollama Issues
 - **Model not found**: Run `ollama pull llama3.2` to download the model

@@ -15,7 +15,6 @@ This project showcases a complete MCP ecosystem built in Java, including:
 ### Prerequisites
 - Java 21+
 - Maven 3.8+
-- Docker Desktop
 - VS Code with Java Extension Pack
 - Ollama (for LLM integration)
 
