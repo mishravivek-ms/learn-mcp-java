@@ -1,4 +1,4 @@
-# Monkey MCP Java Tutorial
+# Learn MCP Java Tutorial
 
 A comprehensive Java tutorial demonstrating Model Context Protocol (MCP) implementation with Quarkus server and LangChain4j client, featuring a monkey species dataset for hands-on learning.
 
