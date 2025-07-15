@@ -1,5 +1,7 @@
 # Part 2: Building your first Java-based MCP Server using GitHub Copilot
 
+> **Navigation**: [← Back to Prerequisites](00_PROJECT_SETUP.md) | [Next: Part 3 - MCP Client →](02_MCP_CLIENT.md)
+
 ## Overview
 
 In this section, you'll learn how to build an MCP server with a fun monkey-themed use case.

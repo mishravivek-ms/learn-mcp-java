@@ -1,69 +1,128 @@
-# monkey-mcp-java
+# Monkey MCP Java Tutorial
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
+A comprehensive Java tutorial demonstrating Model Context Protocol (MCP) implementation with Quarkus server and LangChain4j client, featuring a monkey species dataset for hands-on learning.
 
-If you want to learn more about Quarkus, please visit its website: <https://quarkus.io/>.
+## 📚 Tutorial Overview
 
-## Create your own
+This project showcases a complete MCP ecosystem built in Java, including:
 
-Start installing the Quarkus CLI.
+- **MCP Server**: Quarkus-based HTTP SSE server with monkey species data tools
+- **MCP Client**: Interactive CLI client using LangChain4j and Ollama integration
+- **Step-by-step Documentation**: Complete guides for building MCP applications with GitHub Copilot
 
-Then run the following command to create your own project:
+## 🚀 Quick Start
 
-```shell script
-quarkus create app --no-code -x rest-client-jackson,qute,mcp-server-sse monkey-mcp-java
+### Prerequisites
+- Java 21+
+- Maven 3.8+
+- Docker Desktop
+- VS Code with Java Extension Pack
+- Ollama (for LLM integration)
+
+### Getting Started
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/brunoborges/monkey-mcp-java.git
+   cd monkey-mcp-java
+   ```
+
+2. **Start the MCP Server**
+   ```bash
+   cd monkey-mcp-server
+   ./mvnw quarkus:dev
+   ```
+
+3. **Run the MCP Client**
+   ```bash
+   cd monkey-mcp-client
+   ./mvnw package
+   java -jar target/monkey-mcp-client.jar
+   ```
+
+## 📖 Tutorial Structure
+
+This tutorial is organized into sequential parts:
+
+| Part | Title | Description |
+|------|-------|-------------|
+| **[Part 1: Prerequisites and Setup](00_PROJECT_SETUP.md)** | Project Setup | Install tools, understand MCP, and prepare your environment |
+| **[Part 2: Building the MCP Server](01_MCP_SERVER.md)** | MCP Server | Build a Quarkus-based MCP server with monkey species tools |
+| **[Part 3: Building the MCP Client](02_MCP_CLIENT.md)** | MCP Client | Create an interactive CLI client using LangChain4j |
+
+## 🏗️ Architecture
+
+```
+┌─────────────────┐    MCP Protocol    ┌──────────────────┐
+│   AI Assistant  │ ◄─────────────────►│   MCP Server     │
+│ (VS Code, etc.) │    (HTTP SSE)      │ (Java/Quarkus)   │
+└─────────────────┘                    └──────────────────┘
+                                              │
+                                              ▼
+                                       ┌──────────────────┐
+                                       │  Monkey Services │
+                                       │ (Business Logic) │
+                                       └──────────────────┘
 ```
 
-## Running the application in dev mode
+## 🐒 Featured Tools
 
-You can run your application in dev mode that enables live coding using:
+The MCP server provides these monkey species tools:
 
-```shell script
-./mvnw quarkus:dev
+- **List Species**: Get all available monkey species
+- **Species Details**: Retrieve detailed information about specific species
+- **Random Species**: Get a random monkey species
+- **Statistics**: View dataset statistics and access counts
+
+## 🛠️ Technology Stack
+
+- **Java 21**: Modern Java features and performance
+- **Quarkus**: Supersonic Subatomic Java Framework
+- **LangChain4j**: Java framework for building LLM applications
+- **Ollama**: Local LLM runtime
+- **Maven**: Build and dependency management
+- **PicoCLI**: Command-line interface framework
+
+## 🎯 Learning Objectives
+
+By completing this tutorial, you will:
+
+- Understand MCP protocol and its benefits
+- Build production-ready MCP servers with Quarkus
+- Create MCP clients using LangChain4j
+- Integrate with local LLMs using Ollama
+- Apply AI-assisted development with GitHub Copilot
+
+## 📝 Project Structure
+
+```
+monkey-mcp-java/
+├── 00_PROJECT_SETUP.md       # Prerequisites and environment setup
+├── 01_MCP_SERVER.md          # MCP Server implementation guide
+├── 02_MCP_CLIENT.md          # MCP Client implementation guide
+├── monkey-mcp-server/        # Quarkus MCP server project
+│   ├── src/main/java/        # Java source code
+│   └── pom.xml              # Maven dependencies
+└── monkey-mcp-client/        # LangChain4j MCP client project
+    ├── src/main/java/        # Java source code
+    └── pom.xml              # Maven dependencies
 ```
 
-> **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at <http://localhost:8080/q/dev/>.
+## 🤝 Contributing
 
-## Packaging and running the application
+This is an educational project designed to teach MCP implementation in Java. Contributions, suggestions, and improvements are welcome!
 
-The application can be packaged using:
+## 📄 License
 
-```shell script
-./mvnw package
-```
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-It produces the `quarkus-run.jar` file in the `target/quarkus-app/` directory.
-Be aware that it’s not an _über-jar_ as the dependencies are copied into the `target/quarkus-app/lib/` directory.
+## 🔗 Useful Links
 
-The application is now runnable using `java -jar target/quarkus-app/quarkus-run.jar`.
+- [Model Context Protocol Specification](https://modelcontextprotocol.io/)
+- [Quarkus Framework](https://quarkus.io/)
+- [LangChain4j Documentation](https://docs.langchain4j.dev/)
+- [Ollama](https://ollama.com/)
 
-If you want to build an _über-jar_, execute the following command:
+---
 
-```shell script
-./mvnw package -Dquarkus.package.jar.type=uber-jar
-```
-
-The application, packaged as an _über-jar_, is now runnable using `java -jar target/*-runner.jar`.
-
-## Creating a native executable
-
-You can create a native executable using:
-
-```shell script
-./mvnw package -Dnative
-```
-
-Or, if you don't have GraalVM installed, you can run the native executable build in a container using:
-
-```shell script
-./mvnw package -Dnative -Dquarkus.native.container-build=true
-```
-
-You can then execute your native executable with: `./target/monkey-mcp-java-1.0.0-SNAPSHOT-runner`
-
-If you want to learn more about building native executables, please consult <https://quarkus.io/guides/maven-tooling>.
-
-## Related Guides
-
-- Qute ([guide](https://quarkus.io/guides/qute)): Offer templating support for web, email, etc in a build time, type-safe way
-- MCP Server - HTTP/SSE ([guide](https://docs.quarkiverse.io/quarkus-mcp-server/dev/index.html)): This extension enables developers to implement the MCP server features easily.
+**Start your MCP journey**: [Part 1 - Prerequisites and Setup →](00_PROJECT_SETUP.md)

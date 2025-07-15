@@ -1,6 +1,6 @@
 # Part 1: Prerequisites and Setup
 
-> **Navigation**: [← Back to Overview](../README.md) | [Next: Part 2 - Monkey MCP Server →](01_MCP_SERVER.md)
+> **Navigation**: [← Back to Overview](README.md) | [Next: Part 2 - MCP Server →](01_MCP_SERVER.md)
 
 ## What You'll Need
 Before diving into MCP development with Java and Quarkus, ensure you have the following tools installed:
@@ -32,9 +32,9 @@ Before diving into MCP development with Java and Quarkus, ensure you have the fo
 
 ### 6. Ollama LLM Locally
 - Install [Ollama](https://ollama.com/) to run LLM models locally
-- Pull the `deepseek-r1` model for MCP tooling support
+- Pull the `llama3.2` model for MCP tooling support
 ```bash
-ollama pull deepseek-r1
+ollama pull llama3.2
 ```
 - Start the Ollama server: `ollama serve`
 
@@ -50,6 +50,7 @@ ollama pull deepseek-r1
 - [ ] Extension Pack for Java active in VS Code
 - [ ] Quarkus CLI installed
 - [ ] Docker Desktop installed and running
+- [ ] Ollama installed with llama3.2 model
 - [ ] Basic understanding of MCP concepts
 
 ## What is Model Context Protocol (MCP)?
@@ -68,14 +69,14 @@ The Model Context Protocol (MCP) is an open standard that enables AI assistants 
 3. **Enterprise Ready**: Built-in support for dependency injection, configuration, and async patterns
 4. **Type Safety**: Strong typing with compile-time validation
 5. **Rich Tooling**: Leverage VS Code Java extensions and Quarkus dev tools
-6. **STDIO Protocol**: Simple and efficient communication via standard input/output
+6. **HTTP SSE Protocol**: Efficient real-time communication via Server-Sent Events
 
 ### Architecture Overview
 
 ```
 ┌─────────────────┐    MCP Protocol    ┌──────────────────┐
 │   AI Assistant  │ ◄─────────────────►│   MCP Server     │
-│ (VS Code, etc.) │    (STDIO/JSON)    │ (Java/Quarkus)   │
+│ (VS Code, etc.) │    (HTTP SSE)      │ (Java/Quarkus)   │
 └─────────────────┘                    └──────────────────┘
                                               │
                                               ▼
@@ -95,16 +96,14 @@ The Model Context Protocol (MCP) is an open standard that enables AI assistants 
 
 ### Project Structure
 
-This Quarkus-based MCP server will include:
+This tutorial will guide you through building:
 
-- **MCP Protocol Implementation**: STDIO-based communication with AI assistants
-- **Monkey Data Model**: Java classes representing monkey species and their attributes
-- **Service Layer**: Business logic for managing monkey data
-- **Tools and Resources**: MCP tools for querying and managing monkey information
-- **Configuration**: Quarkus application properties and dependency injection setup
+- **MCP Server**: Quarkus-based HTTP SSE server with monkey species tools
+- **MCP Client**: Interactive CLI client using LangChain4j and Ollama
+- **Integration**: Connect both components for a complete MCP ecosystem
 
 ---
 
 > **Next Step**: Now that you understand MCP and have your Java/Quarkus environment set up, let's build your MCP server for monkey species management.
 
-**Continue to**: [Part 2 - Building Monkey MCP Server →](01_MCP_SERVER.md)
+**Continue to**: [Part 2 - Building MCP Server →](01_MCP_SERVER.md)

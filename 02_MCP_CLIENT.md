@@ -1,6 +1,6 @@
 # Part 3: Building Your Own MCP Client Application
 
-> **Navigation**: [← Back to MCP Server](01_MCP_SERVER.md) | [Next: Advanced Topics →](03_ADVANCED_TOPICS.md)
+> **Navigation**: [← Back to MCP Server](01_MCP_SERVER.md) | [Back to Overview](README.md)
 
 ## Overview
 
