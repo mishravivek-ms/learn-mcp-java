@@ -52,7 +52,7 @@ Now that your project is set up, let's use GitHub Copilot to help us implement t
 
 #### Provide GitHub Copilot Instructions for better context
 
-Create a file named `java-cli-mcp-client.instructions.md` with the following content:
+Inside the folder `.github`, create a file named `java-console-app-mcp-client.instructions.md` with the following content:
 
 ```markdown
     # Java CLI MCP Client with LangChain4J, PicoCLI, and Ollama
