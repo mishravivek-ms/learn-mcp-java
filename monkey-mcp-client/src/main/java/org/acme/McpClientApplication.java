@@ -9,7 +9,7 @@ import picocli.CommandLine.Command;
 @Command(name = "mcp-client", 
          mixinStandardHelpOptions = true, 
          version = "1.0.0", 
-         description = "Console application to interact with AI and MCP servers", 
+         description = "Console app to chat with AI+MCP servers using Ollama Local llama3.2 model", 
          subcommands = {ChatCommand.class, ToolsCommand.class })
 public class McpClientApplication {
 
