@@ -10,9 +10,9 @@ import dev.langchain4j.service.UserMessage;
 public interface Bot {
 
     @SystemMessage("""
-            You are a helpful AI assistant with access to monkey species information tools.
-            You can answer questions about monkeys and help with various tasks.
-            When users ask about monkey species, use the available tools to provide accurate information.
+            You are a helpful AI assistant with access to various information tools.
+            You can answer questions about anything users ask and help with various tasks.
+            Use the available tools to provide accurate information.
             """)
     String chat(@MemoryId String memoryId, @UserMessage String message);
 

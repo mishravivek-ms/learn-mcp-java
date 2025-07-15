@@ -21,7 +21,6 @@ import dev.langchain4j.mcp.client.transport.http.HttpMcpTransport;
 
 public class ToolsService {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
     private final List<McpClient> mcpClients = new ArrayList<>();
     private McpToolProvider toolProvider;
 
@@ -44,6 +43,7 @@ public class ToolsService {
             return;
         }
 
+        ObjectMapper objectMapper = new ObjectMapper();
         try (var is = inputStream) {
             var config = objectMapper.readTree(is);
             var servers = config.get("servers");
@@ -54,15 +54,11 @@ public class ToolsService {
             }
 
             servers.fieldNames().forEachRemaining(serverName -> {
-                try {
-                    registerServer(serverName, servers.get(serverName));
-                } catch (Exception e) {
-                    err.printf("✗ Failed to register MCP server: %s%n", serverName);
-                }
+                registerServer(serverName, servers.get(serverName));
             });
 
-            out.printf("✓ MCP server registration completed. %d server%s registered%n", 
-                mcpClients.size(), mcpClients.size() == 1 ? "" : "s");
+            out.printf("✓ MCP server registration completed. %d server%s registered%n",
+                    mcpClients.size(), mcpClients.size() == 1 ? "" : "s");
         } catch (IOException e) {
             err.printf("✗ Failed to read mcp.json configuration: %s%n", e.getMessage());
         }
@@ -75,7 +71,8 @@ public class ToolsService {
                 out.printf("→ Loading mcp.json from working directory: %s%n", workingDirConfig.toAbsolutePath());
                 return Files.newInputStream(workingDirConfig);
             } catch (IOException e) {
-                err.printf("✗ Failed to read mcp.json from working directory, falling back to bundled resource: %s%n", e.getMessage());
+                err.printf("✗ Failed to read mcp.json from working directory, falling back to bundled resource: %s%n",
+                        e.getMessage());
             }
         }
 
@@ -127,27 +124,21 @@ public class ToolsService {
                 .mcpClients(mcpClients.toArray(new McpClient[0]))
                 .build();
 
-        out.printf("✓ Tool provider initialized with %d MCP client%s%n", 
-            mcpClients.size(), mcpClients.size() == 1 ? "" : "s");
+        out.printf("✓ Tool provider initialized with %d MCP client%s%n",
+                mcpClients.size(), mcpClients.size() == 1 ? "" : "s");
     }
 
     public List<ToolSpecification> getAvailableTools() {
         var allTools = new ArrayList<ToolSpecification>();
 
         for (var client : mcpClients) {
-            try {
-                var clientTools = client.listTools();
-                allTools.addAll(clientTools);
-                out.printf("✓ Retrieved %d tool%s from MCP server: %s%n", 
+            var clientTools = client.listTools();
+            allTools.addAll(clientTools);
+            out.printf("✓ Retrieved %d tool%s from MCP server: %s%n",
                     clientTools.size(), clientTools.size() == 1 ? "" : "s", client.key());
-            } catch (Exception e) {
-                out.printf("✗ Failed to get tools from MCP server: %s%n", client.key());
-            }
         }
 
-        out.printf("→ Retrieved %d total tool%s from %d MCP server%s%n", 
-            allTools.size(), allTools.size() == 1 ? "" : "s",
-            mcpClients.size(), mcpClients.size() == 1 ? "" : "s");
+        out.printf("→ Retrieved %d total tool(s) from %d MCP server(s)%n", allTools.size(), mcpClients.size());
         return allTools;
     }
 
