@@ -94,17 +94,22 @@ Now, you can ask GitHub Copilot to help you implement the MCP server by providin
 ```plaintext
     Implement an MCP server with HTTP SSE protocol, using Quarkus, that will have the following capabilities (tools):
 
-    List all monkeys species
-    Get details for a specific monkey species
-    Get a random monkey species
+    - List monkeys species
+    - Get details for a specific monkey species
+    - Get a random monkey species
+    - Get statistics about the monkey species data set
+    
     A monkey species has the following data, as example.
 
-    Species Name: Proboscis Monkey
-    Location: Borneo
-    Details: The proboscis monkey or long-nosed monkey, known as the bekantan in Malay, is a reddish-brown arboreal Old World monkey that is endemic to the south-east Asian island of Borneo.
-    Population: 15000
-    Lat/Lon: 0.961883, 114.55485
-    Accessed: 1 times
+    - Species Name: Proboscis Monkey
+    - Location: Borneo
+    - Details: The proboscis monkey or long-nosed monkey, known as the bekantan in Malay, is a reddish-brown arboreal Old World monkey that is endemic to the south-east Asian island of Borneo.
+    - Population: 15000
+    - Lat/Lon: 0.961883, 114.55485
+    - Accessed: 1 times
+
+    Include a data set of monkey species in the code. 
+    Add a few fictional species with different attributes.
 ```
 
 Perfect, now let's test our MCP server with the MCP Inspector tool.
