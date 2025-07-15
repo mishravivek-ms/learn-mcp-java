@@ -59,7 +59,7 @@ Now that your project is set up, let's use GitHub Copilot to help us implement t
 Visual Studio Code [has a feature](https://code.visualstudio.com/docs/copilot/copilot-customization#_use-instructionsmd-files) that allows you to provide instructions to GitHub Copilot to help it perform tasks in a particular way. 
 Here we will give it instructions to build an MCP server using Java and Quarkus.
 
-Create a file named `quarkus-mcp-server.instructions.md` with the following content:
+Create the folder `.github` and add a file named `quarkus-mcp-server.instructions.md` with the following content:
 
 ```markdown
     # Quarkus MCP Server
